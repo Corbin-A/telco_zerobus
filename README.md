@@ -13,7 +13,7 @@ Databricks.
 
 - Python 3.10+ on your laptop
 - Databricks workspace URL and PAT with access to your Lakeflow Connect destination
-- Zerobus ingestion path (defaults to `/api/2.0/lakeflow/connect/zerobus/ingest`)
+- Zerobus destination ID (Lakeflow Connect > Zerobus destination)
 
 ## Quick start
 
@@ -36,9 +36,11 @@ Databricks.
    - `DATABRICKS_PAT` – PAT with permission to ingest
 
    Optional overrides:
-   - `ZEROBUS_ENDPOINT_PATH` – if the ingestion path differs
+   - `ZEROBUS_DESTINATION_ID` – builds the documented `/destinations/<id>/events:ingest` path
+   - `ZEROBUS_ENDPOINT_PATH` – override the ingest path entirely
    - `ZEROBUS_TOPIC` – default topic/stream name
    - `ZEROBUS_TARGET_TABLE` – fully-qualified table to land data
+   - `ZEROBUS_USE_SDK=true` – leverage the Databricks Python SDK (recommended)
    - `ZEROBUS_DRY_RUN=true` – log payloads instead of sending
 
 3. Launch the web UI:
@@ -53,9 +55,9 @@ Databricks.
 
 - `app/producer_manager.py` houses an async manager that tracks producers, spawns a
   background task per producer, and sends events through `ZeroBusClient`.
-- `app/zerobus_client.py` is the only place that knows the Zerobus HTTP contract.
-  If the API changes, edit `build_payload` to match the exact schema; the rest of the
-  demo remains unchanged.
+- `app/zerobus_client.py` is the only place that knows the Zerobus contract. It now
+  prefers the Databricks Python SDK and falls back to direct HTTP when the SDK is not
+  available.
 - `app/static/index.html` is a minimal UI that calls the FastAPI endpoints and shows
   live status.
 

@@ -24,6 +24,7 @@ class ProducerState:
     started_at: datetime
     last_sent_at: datetime | None = None
     messages_sent: int = 0
+    recent_events: list[dict] = field(default_factory=list)
     task: asyncio.Task | None = None
     stop_event: asyncio.Event = field(default_factory=asyncio.Event)
 
@@ -89,6 +90,9 @@ class ProducerManager:
             await self.client.send_events([event], topic=state.topic)
             state.messages_sent += 1
             state.last_sent_at = now
+            state.recent_events.append(event)
+            if len(state.recent_events) > 10:
+                state.recent_events.pop(0)
         except Exception as exc:  # pragma: no cover - defensive logging only
             logger.exception("Failed to send event from %s: %s", state.producer_id, exc)
 
@@ -140,5 +144,6 @@ class ProducerManager:
             last_sent_at=state.last_sent_at,
             messages_sent=state.messages_sent,
             topic=state.topic,
+            recent_events=list(state.recent_events),
         )
 

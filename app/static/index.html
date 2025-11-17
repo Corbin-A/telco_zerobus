@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Optus Zerobus Demo</title>
+    <style>
+      :root {
+        font-family: Arial, sans-serif;
+        color: #0f172a;
+        background: #f8fafc;
+      }
+      body {
+        margin: 32px;
+        max-width: 1100px;
+      }
+      h1 {
+        margin-bottom: 4px;
+      }
+      .subtitle {
+        color: #475569;
+        margin-top: 0;
+        margin-bottom: 24px;
+      }
+      section {
+        background: white;
+        padding: 16px 18px;
+        margin-bottom: 14px;
+        border-radius: 8px;
+        box-shadow: 0 6px 12px rgba(15, 23, 42, 0.05);
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 12px;
+      }
+      label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+      input, select, textarea {
+        width: 100%;
+        padding: 8px;
+        border-radius: 6px;
+        border: 1px solid #cbd5e1;
+        font-size: 14px;
+      }
+      textarea { min-height: 60px; }
+      button {
+        border: none;
+        padding: 10px 14px;
+        border-radius: 6px;
+        background: #2563eb;
+        color: white;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      button.secondary {
+        background: #0ea5e9;
+      }
+      button.danger {
+        background: #ef4444;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 8px;
+      }
+      th, td {
+        text-align: left;
+        padding: 8px 6px;
+        border-bottom: 1px solid #e2e8f0;
+      }
+      th { background: #f1f5f9; }
+      .status-dot {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        margin-right: 6px;
+      }
+      #toast {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #0f172a;
+        color: white;
+        padding: 12px 14px;
+        border-radius: 8px;
+        display: none;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Optus Zerobus Demo</h1>
+    <p class="subtitle">
+      Launch multiple local producers, send manual alerts, and watch Zerobus ingest in real time.
+    </p>
+
+    <section>
+      <h3>Start a producer</h3>
+      <form id="start-form">
+        <div class="grid">
+          <div>
+            <label for="producer-id">Producer ID</label>
+            <input id="producer-id" name="producer_id" required placeholder="e.g. kiosk-1" />
+          </div>
+          <div>
+            <label for="topic">Topic / stream (optional)</label>
+            <input id="topic" name="topic" placeholder="defaults to config" />
+          </div>
+          <div>
+            <label for="interval">Interval (seconds)</label>
+            <input id="interval" name="interval" type="number" value="1" step="0.1" min="0.1" />
+          </div>
+          <div>
+            <label for="jitter">Jitter (seconds)</label>
+            <input id="jitter" name="jitter" type="number" value="0.5" step="0.1" min="0" />
+          </div>
+        </div>
+        <div style="margin-top: 10px;">
+          <label for="payload-template">Payload template (JSON, optional)</label>
+          <textarea id="payload-template" placeholder='{"region": "NSW", "channel": "retail"}'></textarea>
+        </div>
+        <div style="margin-top: 12px; display: flex; gap: 8px;">
+          <button type="submit">Launch producer</button>
+          <button type="button" class="secondary" onclick="startDemoSet()">Launch 3 demo producers</button>
+        </div>
+      </form>
+    </section>
+
+    <section>
+      <h3>Stop a producer</h3>
+      <div style="display: flex; gap: 8px; align-items: flex-end;">
+        <div style="flex: 1;">
+          <label for="stop-id">Producer ID</label>
+          <input id="stop-id" placeholder="e.g. kiosk-1" />
+        </div>
+        <button class="danger" onclick="stopProducer()">Stop producer</button>
+        <button class="secondary" onclick="stopAll()">Stop all</button>
+      </div>
+    </section>
+
+    <section>
+      <h3>Manual alert</h3>
+      <form id="alert-form">
+        <div class="grid">
+          <div>
+            <label for="alert-message">Message</label>
+            <input id="alert-message" required placeholder="Something noteworthy happened" />
+          </div>
+          <div>
+            <label for="alert-severity">Severity</label>
+            <select id="alert-severity">
+              <option value="info">info</option>
+              <option value="warning" selected>warning</option>
+              <option value="critical">critical</option>
+            </select>
+          </div>
+          <div>
+            <label for="alert-topic">Topic / stream (optional)</label>
+            <input id="alert-topic" placeholder="defaults to config" />
+          </div>
+          <div>
+            <label for="alert-producer">Producer ID (optional)</label>
+            <input id="alert-producer" placeholder="attribute alert to producer" />
+          </div>
+        </div>
+        <div style="margin-top: 12px;">
+          <button type="submit">Send alert</button>
+        </div>
+      </form>
+    </section>
+
+    <section>
+      <h3>Active producers</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Status</th>
+            <th>ID</th>
+            <th>Topic</th>
+            <th>Interval</th>
+            <th>Jitter</th>
+            <th>Messages sent</th>
+            <th>Started</th>
+            <th>Last sent</th>
+          </tr>
+        </thead>
+        <tbody id="status-body">
+          <tr><td colspan="8">No producers yet. Launch one above.</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <div id="toast"></div>
+
+    <script>
+      const toast = document.getElementById('toast');
+
+      function showToast(message, isError = false) {
+        toast.textContent = message;
+        toast.style.display = 'block';
+        toast.style.background = isError ? '#ef4444' : '#0f172a';
+        setTimeout(() => (toast.style.display = 'none'), 2200);
+      }
+
+      async function refreshStatus() {
+        try {
+          const res = await fetch('/api/producers');
+          const data = await res.json();
+          const tbody = document.getElementById('status-body');
+          tbody.innerHTML = '';
+          if (!data.length) {
+            tbody.innerHTML = '<tr><td colspan="8">No producers running.</td></tr>';
+            return;
+          }
+          data.forEach((row) => {
+            const tr = document.createElement('tr');
+            const dotColor = row.running ? '#22c55e' : '#94a3b8';
+            tr.innerHTML = `
+              <td><span class="status-dot" style="background:${dotColor}"></span>${row.running ? 'running' : 'stopped'}</td>
+              <td>${row.producer_id}</td>
+              <td>${row.topic}</td>
+              <td>${row.interval_seconds.toFixed(2)}s</td>
+              <td>${row.jitter_seconds.toFixed(2)}s</td>
+              <td>${row.messages_sent}</td>
+              <td>${row.started_at}</td>
+              <td>${row.last_sent_at || ''}</td>
+            `;
+            tbody.appendChild(tr);
+          });
+        } catch (err) {
+          console.error(err);
+          showToast('Failed to load status', true);
+        }
+      }
+
+      document.getElementById('start-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const producerId = document.getElementById('producer-id').value.trim();
+        const topic = document.getElementById('topic').value.trim();
+        const interval = parseFloat(document.getElementById('interval').value) || 1;
+        const jitter = parseFloat(document.getElementById('jitter').value) || 0;
+        const templateRaw = document.getElementById('payload-template').value.trim();
+        let payloadTemplate = {};
+        if (templateRaw) {
+          try {
+            payloadTemplate = JSON.parse(templateRaw);
+          } catch (err) {
+            showToast('Invalid JSON in payload template', true);
+            return;
+          }
+        }
+
+        try {
+          const res = await fetch('/api/producers', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              producer_id: producerId,
+              topic: topic || null,
+              interval_seconds: interval,
+              jitter_seconds: jitter,
+              payload_template: payloadTemplate,
+            }),
+          });
+          if (!res.ok) throw new Error(await res.text());
+          showToast('Producer started');
+          refreshStatus();
+        } catch (err) {
+          console.error(err);
+          showToast('Failed to start producer', true);
+        }
+      });
+
+      document.getElementById('alert-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        try {
+          const res = await fetch('/api/alert', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              message: document.getElementById('alert-message').value,
+              severity: document.getElementById('alert-severity').value,
+              topic: document.getElementById('alert-topic').value || null,
+              producer_id: document.getElementById('alert-producer').value || null,
+            }),
+          });
+          if (!res.ok) throw new Error(await res.text());
+          showToast('Alert sent');
+        } catch (err) {
+          console.error(err);
+          showToast('Failed to send alert', true);
+        }
+      });
+
+      async function stopProducer() {
+        const id = document.getElementById('stop-id').value.trim();
+        if (!id) {
+          showToast('Provide a producer id', true);
+          return;
+        }
+        try {
+          const res = await fetch(`/api/producers/${encodeURIComponent(id)}`, { method: 'DELETE' });
+          if (!res.ok) throw new Error(await res.text());
+          showToast('Producer stopped');
+          refreshStatus();
+        } catch (err) {
+          console.error(err);
+          showToast('Failed to stop producer', true);
+        }
+      }
+
+      async function stopAll() {
+        const tbody = document.getElementById('status-body');
+        const ids = Array.from(tbody.querySelectorAll('tr td:nth-child(2)'))
+          .map((cell) => cell.textContent)
+          .filter(Boolean);
+        await Promise.all(ids.map((id) => fetch(`/api/producers/${id}`, { method: 'DELETE' })));
+        showToast('Stop all requested');
+        refreshStatus();
+      }
+
+      async function startDemoSet() {
+        const demoProducers = [
+          { id: 'kiosk-1', payload: { region: 'NSW', channel: 'retail' } },
+          { id: 'kiosk-2', payload: { region: 'VIC', channel: 'online' }, interval: 1.2 },
+          { id: 'kiosk-3', payload: { region: 'QLD', channel: 'partner' }, interval: 0.8 },
+        ];
+        for (const demo of demoProducers) {
+          await fetch('/api/producers', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              producer_id: demo.id,
+              interval_seconds: demo.interval || 1,
+              jitter_seconds: 0.3,
+              payload_template: demo.payload,
+            }),
+          });
+        }
+        refreshStatus();
+        showToast('Demo producers launched');
+      }
+
+      setInterval(refreshStatus, 2000);
+      refreshStatus();
+    </script>
+  </body>
+</html>
+

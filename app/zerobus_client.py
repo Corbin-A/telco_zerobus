@@ -1,8 +1,14 @@
+import asyncio
 import json
 import logging
 from typing import Any, Dict, List, Optional
 
 import httpx
+
+try:  # pragma: no cover - optional dependency
+    from databricks.sdk import WorkspaceClient  # type: ignore
+except Exception:  # pragma: no cover - optional dependency
+    WorkspaceClient = None  # type: ignore[misc,assignment]
 
 from .config import Settings
 
@@ -21,6 +27,8 @@ class ZeroBusClient:
     def __init__(self, settings: Settings):
         self.settings = settings
         self._client = httpx.AsyncClient(timeout=settings.request_timeout_seconds)
+        self._sdk_client: WorkspaceClient | None = None
+        self._init_sdk_client()
 
     async def aclose(self) -> None:
         await self._client.aclose()
@@ -59,12 +67,59 @@ class ZeroBusClient:
             )
 
         payload = self.build_payload(events, topic)
-        url = self.settings.endpoint_url
 
+        if self._sdk_client is not None:
+            return await self._send_via_sdk(payload)
+
+        return await self._send_via_http(payload)
+
+    def _init_sdk_client(self) -> None:
+        if not self.settings.use_databricks_sdk:
+            return
+
+        if WorkspaceClient is None:
+            logger.warning(
+                "databricks-sdk not installed; falling back to direct HTTP requests"
+            )
+            return
+
+        if not self.settings.databricks_host or not self.settings.databricks_pat:
+            logger.warning(
+                "Missing Databricks host or token; falling back to direct HTTP requests"
+            )
+            return
+
+        try:
+            self._sdk_client = WorkspaceClient(
+                host=self.settings.databricks_host,
+                token=self.settings.databricks_pat,
+            )
+            logger.info("Using databricks-sdk WorkspaceClient for Zerobus ingestion")
+        except Exception as exc:  # pragma: no cover - defensive logging
+            logger.warning("Unable to initialize databricks-sdk client: %s", exc)
+            self._sdk_client = None
+
+    @staticmethod
+    def _normalize_path(path: str) -> str:
+        if not path.startswith("/"):
+            return f"/{path}"
+        return path
+
+    async def _send_via_http(self, payload: Dict[str, Any]) -> Dict[str, Any]:
+        url = self.settings.endpoint_url
         response = await self._client.post(url, headers=self._headers(), json=payload)
         response.raise_for_status()
         try:
             return response.json()
         except ValueError:
             return {"status": response.status_code, "text": response.text}
+
+    async def _send_via_sdk(self, payload: Dict[str, Any]) -> Dict[str, Any]:
+        assert self._sdk_client is not None  # nosec B101 - guarded by caller
+        path = self._normalize_path(self.settings.zerobus_endpoint_path)
+
+        def _post() -> Dict[str, Any]:
+            return self._sdk_client.api_client.do("POST", path, body=payload)
+
+        return await asyncio.to_thread(_post)
 

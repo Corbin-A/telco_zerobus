@@ -51,7 +51,41 @@ On your laptop:
    pip install -r requirements.txt
    ```
 
-2. Generate the protobuf class that mirrors your target table. Run the tool from
+2. Copy `.env.example` to `.env` and populate the required fields before doing
+   anything else. (They are referenced by the CLI tooling as well as the app.)
+
+   ```bash
+   python -m zerobus.tools.generate_proto \
+     --uc-endpoint "$DATABRICKS_HOST" \
+     --client-id "$ZEROBUS_CLIENT_ID" \
+     --client-secret "$ZEROBUS_CLIENT_SECRET" \
+     --table "$ZEROBUS_TARGET_TABLE" \
+     --output record.proto
+   ```
+
+   Key variables:
+   - `DATABRICKS_HOST` – **must** include the `https://` scheme and omit the `/o=`
+     suffix (for example `https://e2-demo-field-eng.cloud.databricks.com`).
+   - `ZEROBUS_SERVER_ENDPOINT` – Zerobus host from Databricks
+   - `ZEROBUS_CLIENT_ID` / `ZEROBUS_CLIENT_SECRET` – service principal values
+   - `ZEROBUS_PROTO_MODULE` / `ZEROBUS_PROTO_MESSAGE` – e.g. `record_pb2` / `AirQuality`
+   - `ZEROBUS_TARGET_TABLE` – fully-qualified Unity Catalog table
+
+3. Export the values so the Databricks CLI tooling can read them (or manually
+   inline the values instead of relying on environment variables):
+
+   ```bash
+   set -a
+   source .env
+   set +a
+   ```
+
+   Double-check that `echo "$DATABRICKS_HOST"` prints a URL that starts with
+   `https://`. If this variable is blank or missing the scheme, tools such as
+   `zerobus.tools.generate_proto` will emit errors like `Invalid URL '/oidc/v1/token':
+   No scheme supplied`.
+
+4. Generate the protobuf class that mirrors your target table. Run the tool from
    the Databricks Zerobus SDK once per schema change:
 
    ```bash
@@ -63,7 +97,7 @@ On your laptop:
      --output record.proto
    ```
 
-3. Compile the protobuf to a Python module. The example below emits
+5. Compile the protobuf to a Python module. The example below emits
    `record_pb2.py` in the repo root so it is importable without touching
    `PYTHONPATH`:
 
@@ -71,20 +105,7 @@ On your laptop:
    python -m grpc_tools.protoc --python_out=. --proto_path=. record.proto
    ```
 
-4. Copy `.env.example` to `.env` and populate the required fields:
-
-   ```bash
-   cp .env.example .env  # edit values inside
-   ```
-
-   Required variables:
-   - `DATABRICKS_HOST` – `https://<workspace-host>` (no `/o=` suffix)
-   - `ZEROBUS_SERVER_ENDPOINT` – Zerobus host from Databricks
-   - `ZEROBUS_CLIENT_ID` / `ZEROBUS_CLIENT_SECRET` – service principal values
-   - `ZEROBUS_PROTO_MODULE` / `ZEROBUS_PROTO_MESSAGE` – e.g. `record_pb2` / `AirQuality`
-   - `ZEROBUS_TARGET_TABLE` – fully-qualified Unity Catalog table
-
-   Optional toggles:
+   Optional toggles in `.env`:
    - `ZEROBUS_TOPIC` – default topic for new towers
    - `ZEROBUS_DRY_RUN=true` – log payloads without calling Databricks
    - `ZEROBUS_USE_INGEST_SDK=false` – fall back to the legacy HTTP flow (not recommended)

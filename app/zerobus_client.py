@@ -116,7 +116,7 @@ class ZeroBusClient:
 
     async def _send_via_sdk(self, payload: Dict[str, Any]) -> Dict[str, Any]:
         assert self._sdk_client is not None  # nosec B101 - guarded by caller
-        path = self._normalize_path(self.settings.zerobus_endpoint_path)
+        path = self._normalize_path(self.settings.resolved_endpoint_path)
 
         def _post() -> Dict[str, Any]:
             return self._sdk_client.api_client.do("POST", path, body=payload)

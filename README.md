@@ -13,7 +13,7 @@ Databricks.
 
 - Python 3.10+ on your laptop
 - Databricks workspace URL and PAT with access to your Lakeflow Connect destination
-- Zerobus ingestion path (defaults to `/api/2.0/lakeflow/connect/zerobus/events:ingest`)
+- Zerobus destination ID (Lakeflow Connect > Zerobus destination)
 
 ## Quick start
 
@@ -36,7 +36,8 @@ Databricks.
    - `DATABRICKS_PAT` – PAT with permission to ingest
 
    Optional overrides:
-   - `ZEROBUS_ENDPOINT_PATH` – if the ingestion path differs
+   - `ZEROBUS_DESTINATION_ID` – builds the documented `/destinations/<id>/events:ingest` path
+   - `ZEROBUS_ENDPOINT_PATH` – override the ingest path entirely
    - `ZEROBUS_TOPIC` – default topic/stream name
    - `ZEROBUS_TARGET_TABLE` – fully-qualified table to land data
    - `ZEROBUS_USE_SDK=true` – leverage the Databricks Python SDK (recommended)

@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, Field, validator
 
@@ -35,6 +35,10 @@ class ProducerStatus(BaseModel):
     last_sent_at: Optional[datetime]
     messages_sent: int
     topic: str
+    recent_events: List[Dict[str, Any]] = Field(
+        default_factory=list,
+        description="Recent sample events mirrored for the UI stream",
+    )
 
 
 class ManualAlertRequest(BaseModel):

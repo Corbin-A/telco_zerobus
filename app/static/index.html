@@ -4,279 +4,984 @@
     <meta charset="utf-8" />
     <title>Optus Zerobus Demo</title>
     <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
       :root {
-        font-family: Arial, sans-serif;
+        font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
         color: #0f172a;
-        background: #f8fafc;
+        background: #f5f7fb;
+      }
+      * {
+        box-sizing: border-box;
       }
       body {
-        margin: 32px;
-        max-width: 1100px;
+        margin: 0;
+        min-height: 100vh;
+        background: #f5f7fb;
+        color: inherit;
       }
-      h1 {
-        margin-bottom: 4px;
-      }
-      .subtitle {
-        color: #475569;
-        margin-top: 0;
-        margin-bottom: 24px;
-      }
-      section {
-        background: white;
-        padding: 16px 18px;
-        margin-bottom: 14px;
-        border-radius: 8px;
-        box-shadow: 0 6px 12px rgba(15, 23, 42, 0.05);
-      }
-      .grid {
+      .app-shell {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-        gap: 12px;
+        grid-template-columns: 300px 1fr;
+        min-height: 100vh;
       }
-      label {
-        display: block;
-        font-weight: 600;
-        margin-bottom: 4px;
+      aside {
+        background: #ffffff;
+        border-right: 1px solid #e2e8f0;
+        padding: 32px 24px 40px;
+        display: flex;
+        flex-direction: column;
+        gap: 28px;
       }
-      input, select, textarea {
+      .brand .eyebrow {
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        font-size: 12px;
+        color: #2563eb;
+        margin: 0;
+      }
+      .brand h1 {
+        margin: 6px 0 4px 0;
+        font-size: 24px;
+      }
+      .brand p {
+        margin: 0;
+        color: #64748b;
+        line-height: 1.4;
+      }
+      .sidebar-section {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+      .sidebar-section h2 {
+        margin: 0;
+        font-size: 15px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #475569;
+      }
+      .tabs {
+        flex: 1;
+        overflow-y: auto;
+        margin-top: 16px;
+        padding-right: 4px;
+        scrollbar-width: thin;
+      }
+      .tab-button {
         width: 100%;
-        padding: 8px;
-        border-radius: 6px;
-        border: 1px solid #cbd5e1;
-        font-size: 14px;
-      }
-      textarea { min-height: 60px; }
-      button {
-        border: none;
-        padding: 10px 14px;
-        border-radius: 6px;
-        background: #2563eb;
-        color: white;
-        font-weight: 600;
-        cursor: pointer;
-      }
-      button.secondary {
-        background: #0ea5e9;
-      }
-      button.danger {
-        background: #ef4444;
-      }
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 8px;
-      }
-      th, td {
         text-align: left;
-        padding: 8px 6px;
-        border-bottom: 1px solid #e2e8f0;
+        padding: 12px 14px;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        background: #f8fafc;
+        margin-bottom: 10px;
+        color: inherit;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: border 0.2s, background 0.2s;
       }
-      th { background: #f1f5f9; }
+      .tab-button strong {
+        font-size: 15px;
+      }
+      .tab-button.active {
+        border-color: #2563eb;
+        background: #eff4ff;
+      }
+      .tab-button .meta {
+        font-size: 12px;
+        color: #64748b;
+      }
       .status-dot {
-        display: inline-block;
         width: 10px;
         height: 10px;
         border-radius: 50%;
-        margin-right: 6px;
+        margin-right: 8px;
+      }
+      main {
+        background: #f5f7fb;
+        padding: 32px 40px 60px;
+      }
+      .panel-shell {
+        max-width: 980px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
+      .page-header {
+        background: #ffffff;
+        border-radius: 20px;
+        padding: 28px;
+        border: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: space-between;
+        gap: 24px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      .page-header h2 {
+        margin: 6px 0;
+      }
+      .page-header p {
+        margin: 0;
+        color: #475569;
+        max-width: 460px;
+      }
+      .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        flex-wrap: wrap;
+      }
+      .hero-metric {
+        min-width: 130px;
+        padding: 10px 14px;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        background: #f8fafc;
+      }
+      .hero-metric span {
+        display: block;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #64748b;
+      }
+      .hero-metric strong {
+        font-size: 24px;
+      }
+      .ticker-card {
+        background: #ffffff;
+        border-radius: 16px;
+        border: 1px solid #e2e8f0;
+        padding: 18px 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+      }
+      .ticker-card span {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #94a3b8;
+      }
+      .ticker-card p {
+        margin: 4px 0 0 0;
+        color: #0f172a;
+        font-weight: 500;
+      }
+      .empty-state {
+        text-align: center;
+        margin-top: 20px;
+        background: #ffffff;
+        border-radius: 20px;
+        padding: 60px 30px;
+        border: 1px solid #e2e8f0;
+        color: #475569;
+      }
+      .empty-state h2 {
+        margin-top: 0;
+      }
+      .tower-panel {
+        background: #ffffff;
+        border-radius: 24px;
+        padding: 32px;
+        border: 1px solid #e2e8f0;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
+      .panel-header {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+        flex-wrap: wrap;
+      }
+      .panel-header h2 {
+        margin: 8px 0 4px 0;
+      }
+      .topic-pill {
+        border-radius: 999px;
+        padding: 6px 12px;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        background: #eff4ff;
+        color: #1d4ed8;
+        width: fit-content;
+      }
+      .panel-meta {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 8px;
+      }
+      .status-chip {
+        border-radius: 999px;
+        padding: 8px 14px;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 12px;
+        letter-spacing: 0.08em;
+      }
+      .status-detail {
+        font-size: 13px;
+        color: #64748b;
+      }
+      .panel-times {
+        font-size: 12px;
+        color: #94a3b8;
+        text-align: right;
+      }
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 16px;
+      }
+      .stat-card {
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 16px;
+        background: #f8fafc;
+      }
+      .stat-card span {
+        text-transform: uppercase;
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        color: #94a3b8;
+      }
+      .stat-card strong {
+        font-size: 20px;
+        display: block;
+        margin-top: 6px;
+      }
+      .panel-controls {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .stream-card {
+        border-radius: 20px;
+        border: 1px solid #e2e8f0;
+        background: #fff;
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+      .stream-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 20px;
+        flex-wrap: wrap;
+      }
+      .stream-header h3 {
+        margin: 6px 0 0 0;
+      }
+      .stream-count {
+        font-size: 12px;
+        color: #64748b;
+      }
+      .stream-meta-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 12px;
+      }
+      .stream-meta {
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 12px;
+        background: #f8fafc;
+      }
+      .stream-meta span {
+        display: block;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #94a3b8;
+      }
+      .stream-meta strong {
+        display: block;
+        margin-top: 4px;
+      }
+      .stream-log {
+        max-height: 280px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding-right: 6px;
+      }
+      .stream-item {
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 12px;
+        background: #f8fafc;
+      }
+      .stream-item-header {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+        color: #475569;
+        margin-bottom: 6px;
+      }
+      .stream-item pre {
+        margin: 0;
+        font-family: 'JetBrains Mono', Consolas, monospace;
+        font-size: 12px;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+      .card {
+        border-radius: 20px;
+        border: 1px solid #e2e8f0;
+        padding: 24px;
+        background: #fff;
+      }
+      .alert-card form {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+      form label {
+        font-size: 13px;
+        font-weight: 600;
+        display: block;
+        margin-bottom: 4px;
+      }
+      form input,
+      form textarea,
+      form select {
+        width: 100%;
+        border: 1px solid #cbd5f5;
+        border-radius: 8px;
+        background: #fff;
+        color: #0f172a;
+        padding: 9px 10px;
+        font-size: 14px;
+      }
+      form textarea {
+        min-height: 70px;
+        resize: vertical;
+      }
+      .help-text {
+        font-size: 12px;
+        color: #64748b;
+        margin: 4px 0 0 0;
+      }
+      button {
+        border: none;
+        border-radius: 999px;
+        padding: 12px 22px;
+        font-weight: 600;
+        cursor: pointer;
+        font-size: 14px;
+      }
+      button.primary {
+        background: #2563eb;
+        color: #fff;
+      }
+      button.secondary {
+        background: transparent;
+        border: 1px solid #cbd5f5;
+        color: #0f172a;
+      }
+      button.ghost {
+        background: #0f172a;
+        color: #fff;
+      }
+      button.danger {
+        background: #fee2e2;
+        color: #b91c1c;
+        border: 1px solid #fecaca;
+      }
+      button:disabled {
+        opacity: 0.6;
+        cursor: default;
+      }
+      .form-stack {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      details.advanced {
+        margin-top: 8px;
+        border: 1px solid #cbd5f5;
+        border-radius: 12px;
+        background: #f8fafc;
+      }
+      details.advanced summary {
+        cursor: pointer;
+        padding: 10px 12px;
+        font-weight: 600;
+        list-style: none;
+      }
+      details.advanced summary::-webkit-details-marker {
+        display: none;
+      }
+      .advanced-body {
+        padding: 0 12px 12px 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .advanced-footnote {
+        font-size: 11px;
+        color: #94a3b8;
+        margin: 0;
       }
       #toast {
         position: fixed;
-        top: 20px;
-        right: 20px;
+        bottom: 30px;
+        right: 30px;
         background: #0f172a;
         color: white;
-        padding: 12px 14px;
-        border-radius: 8px;
+        padding: 12px 18px;
+        border-radius: 12px;
         display: none;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+      }
+      .modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s ease;
+        z-index: 1000;
+      }
+      .modal.visible {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .modal-window {
+        background: white;
+        border-radius: 20px;
+        width: min(520px, 100%);
+        padding: 28px;
+        position: relative;
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+      .modal-close {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        background: transparent;
+        border: none;
+        font-size: 26px;
+        line-height: 1;
+        cursor: pointer;
+        color: #475569;
+      }
+      .modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        margin-top: 20px;
+      }
+      @media (max-width: 960px) {
+        .app-shell {
+          grid-template-columns: 1fr;
+        }
+        aside {
+          border-right: none;
+          border-bottom: 1px solid #e2e8f0;
+        }
       }
     </style>
   </head>
   <body>
-    <h1>Optus Zerobus Demo</h1>
-    <p class="subtitle">
-      Launch multiple local producers, send manual alerts, and watch Zerobus ingest in real time.
-    </p>
-
-    <section>
-      <h3>Start a producer</h3>
-      <form id="start-form">
-        <div class="grid">
-          <div>
-            <label for="producer-id">Producer ID</label>
-            <input id="producer-id" name="producer_id" required placeholder="e.g. kiosk-1" />
+    <div class="app-shell">
+      <aside>
+        <div class="brand">
+          <p class="eyebrow">Optus Zerobus</p>
+          <h1>Telemetry console</h1>
+          <p>Launch demo towers and monitor the stream you will validate inside Databricks.</p>
+        </div>
+        <div class="sidebar-section">
+          <h2>Towers</h2>
+          <div id="tower-tabs" class="tabs"></div>
+          <p id="tab-empty" class="help-text" style="margin-top: 12px;">No towers yet. Use the create button to start one.</p>
+        </div>
+      </aside>
+      <main>
+        <div class="panel-shell">
+          <div class="page-header">
+            <div>
+              <p class="eyebrow" style="color: #94a3b8;">Network overview</p>
+              <h2>Control center for tower data</h2>
+              <p>Keep tabs on which towers are live, peek at the stream, and capture screenshots to prove Databricks ingestion.</p>
+            </div>
+            <div class="header-actions">
+              <div class="hero-metric">
+                <span>Active towers</span>
+                <strong id="hero-count">0</strong>
+              </div>
+              <div class="hero-metric">
+                <span>Cached events</span>
+                <strong id="hero-events">0</strong>
+              </div>
+              <button type="button" class="primary" data-open-create>Create tower</button>
+            </div>
           </div>
-          <div>
-            <label for="topic">Topic / stream (optional)</label>
-            <input id="topic" name="topic" placeholder="defaults to config" />
+          <div class="ticker-card">
+            <div>
+              <span>Latest signal</span>
+              <p id="telemetry-ticker">Awaiting first tower to broadcast telemetry…</p>
+            </div>
+            <button id="refresh-btn" type="button" class="secondary">Refresh data</button>
           </div>
-          <div>
-            <label for="interval">Interval (seconds)</label>
-            <input id="interval" name="interval" type="number" value="1" step="0.1" min="0.1" />
+          <div id="empty-panel" class="empty-state">
+            <h2>No towers are active</h2>
+            <p>Launch one to start producing telemetry locally and mirror it into Databricks.</p>
+            <button type="button" class="primary" data-open-create>Create tower</button>
           </div>
-          <div>
-            <label for="jitter">Jitter (seconds)</label>
-            <input id="jitter" name="jitter" type="number" value="0.5" step="0.1" min="0" />
+          <div id="tower-panel" class="tower-panel" style="display: none;">
+            <div class="panel-header">
+              <div>
+                <p class="eyebrow" style="color: #94a3b8;">Active tower</p>
+                <h2 id="panel-name">—</h2>
+                <p id="panel-description" style="margin: 4px 0 10px 0; color: #475569;">—</p>
+                <div id="panel-topic" class="topic-pill">—</div>
+              </div>
+              <div class="panel-meta">
+                <span id="panel-status" class="status-chip">—</span>
+                <span id="status-detail" class="status-detail">—</span>
+                <div class="panel-times">
+                  <div>Started <strong id="panel-started">—</strong></div>
+                  <div>Last send <strong id="panel-last">—</strong></div>
+                </div>
+              </div>
+            </div>
+            <div class="stats-grid">
+              <div class="stat-card">
+                <span>Interval</span>
+                <strong id="panel-interval">—</strong>
+              </div>
+              <div class="stat-card">
+                <span>Jitter</span>
+                <strong id="panel-jitter">—</strong>
+              </div>
+              <div class="stat-card">
+                <span>Throughput</span>
+                <strong id="panel-throughput">—</strong>
+              </div>
+              <div class="stat-card">
+                <span>Messages sent</span>
+                <strong id="panel-messages">0</strong>
+              </div>
+            </div>
+            <div class="panel-controls">
+              <button id="stop-btn" class="danger" type="button">Stop tower</button>
+            </div>
+            <div class="stream-card">
+              <div class="stream-header">
+                <div>
+                  <p class="eyebrow" style="color: #94a3b8;">Live data stream</p>
+                  <h3>Events mirrored to Databricks</h3>
+                  <p style="margin: 4px 0 0 0; color: #475569;">Newest events first so you can capture the feed.</p>
+                </div>
+                <span id="stream-count" class="stream-count"></span>
+              </div>
+              <div class="stream-meta-grid">
+                <div class="stream-meta">
+                  <span>Topic</span>
+                  <strong id="databricks-topic">—</strong>
+                </div>
+                <div class="stream-meta">
+                  <span>Cache depth</span>
+                  <strong id="cache-depth">0 cached events</strong>
+                </div>
+                <div class="stream-meta">
+                  <span>Payload footprint</span>
+                  <strong id="panel-payload-size">—</strong>
+                </div>
+                <div class="stream-meta">
+                  <span>Latency</span>
+                  <strong id="panel-latency">—</strong>
+                </div>
+              </div>
+              <div id="stream-log" class="stream-log"></div>
+            </div>
+            <div class="card alert-card">
+              <h3>Send manual alert</h3>
+              <form id="alert-form">
+                <div>
+                  <label for="alert-message">Message</label>
+                  <input id="alert-message" placeholder="Tower maintenance event" required />
+                </div>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                  <div style="flex: 1; min-width: 160px;">
+                    <label for="alert-severity">Severity</label>
+                    <select id="alert-severity">
+                      <option value="info">info</option>
+                      <option value="warning" selected>warning</option>
+                      <option value="critical">critical</option>
+                    </select>
+                  </div>
+                  <div style="flex: 1; min-width: 200px;">
+                    <label for="alert-topic">Topic override (optional)</label>
+                    <input id="alert-topic" placeholder="leave blank for default" />
+                  </div>
+                </div>
+                <button type="submit" class="primary">Send alert from tower</button>
+              </form>
+            </div>
           </div>
         </div>
-        <div style="margin-top: 10px;">
-          <label for="payload-template">Payload template (JSON, optional)</label>
-          <textarea id="payload-template" placeholder='{"region": "NSW", "channel": "retail"}'></textarea>
-        </div>
-        <div style="margin-top: 12px; display: flex; gap: 8px;">
-          <button type="submit">Launch producer</button>
-          <button type="button" class="secondary" onclick="startDemoSet()">Launch 3 demo producers</button>
-        </div>
-      </form>
-    </section>
-
-    <section>
-      <h3>Stop a producer</h3>
-      <div style="display: flex; gap: 8px; align-items: flex-end;">
-        <div style="flex: 1;">
-          <label for="stop-id">Producer ID</label>
-          <input id="stop-id" placeholder="e.g. kiosk-1" />
-        </div>
-        <button class="danger" onclick="stopProducer()">Stop producer</button>
-        <button class="secondary" onclick="stopAll()">Stop all</button>
-      </div>
-    </section>
-
-    <section>
-      <h3>Manual alert</h3>
-      <form id="alert-form">
-        <div class="grid">
+      </main>
+    </div>
+    <div id="create-modal" class="modal" aria-hidden="true">
+      <div class="modal-window" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <button class="modal-close" type="button" data-close-modal>&times;</button>
+        <p class="eyebrow" style="color: #2563eb;">Launch a new tower</p>
+        <h2 id="modal-title" style="margin: 6px 0 12px 0;">Create tower</h2>
+        <p style="color: #475569;">Pick an ID and a curated profile. You can optionally override the payload or timings in the advanced section.</p>
+        <form id="tower-form" class="form-stack">
           <div>
-            <label for="alert-message">Message</label>
-            <input id="alert-message" required placeholder="Something noteworthy happened" />
+            <label for="tower-id">Tower ID</label>
+            <input id="tower-id" placeholder="e.g. tower-001" required />
           </div>
           <div>
-            <label for="alert-severity">Severity</label>
-            <select id="alert-severity">
-              <option value="info">info</option>
-              <option value="warning" selected>warning</option>
-              <option value="critical">critical</option>
+            <label for="tower-profile">Traffic profile</label>
+            <select id="tower-profile">
+              <option value="balanced">Balanced NSW retail (1 msg/s)</option>
+              <option value="bursty">Bursty metro upgrades (0.5 msg/s)</option>
+              <option value="sleepy">Sleepy regional telemetry (0.2 msg/s)</option>
             </select>
+            <p id="profile-description" class="help-text"></p>
           </div>
-          <div>
-            <label for="alert-topic">Topic / stream (optional)</label>
-            <input id="alert-topic" placeholder="defaults to config" />
+          <details class="advanced">
+            <summary>Fine-tune advanced config</summary>
+            <div class="advanced-body">
+              <div>
+                <label for="tower-topic">Topic / stream override</label>
+                <input id="tower-topic" placeholder="defaults to settings" />
+              </div>
+              <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 120px;">
+                  <label for="tower-interval">Interval (s)</label>
+                  <input id="tower-interval" type="number" min="0.1" step="0.1" placeholder="profile default" />
+                </div>
+                <div style="flex: 1; min-width: 120px;">
+                  <label for="tower-jitter">Jitter (s)</label>
+                  <input id="tower-jitter" type="number" min="0" step="0.1" placeholder="profile default" />
+                </div>
+              </div>
+              <div>
+                <label for="tower-payload">Payload template (JSON)</label>
+                <textarea id="tower-payload" placeholder='leave blank for profile template'></textarea>
+              </div>
+              <p class="advanced-footnote">Leave everything blank to inherit from the selected traffic profile.</p>
+            </div>
+          </details>
+          <div class="modal-actions">
+            <button type="button" class="secondary" data-close-modal>Cancel</button>
+            <button type="submit" class="primary">Start tower</button>
           </div>
-          <div>
-            <label for="alert-producer">Producer ID (optional)</label>
-            <input id="alert-producer" placeholder="attribute alert to producer" />
-          </div>
-        </div>
-        <div style="margin-top: 12px;">
-          <button type="submit">Send alert</button>
-        </div>
-      </form>
-    </section>
-
-    <section>
-      <h3>Active producers</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>Status</th>
-            <th>ID</th>
-            <th>Topic</th>
-            <th>Interval</th>
-            <th>Jitter</th>
-            <th>Messages sent</th>
-            <th>Started</th>
-            <th>Last sent</th>
-          </tr>
-        </thead>
-        <tbody id="status-body">
-          <tr><td colspan="8">No producers yet. Launch one above.</td></tr>
-        </tbody>
-      </table>
-    </section>
-
+        </form>
+      </div>
+    </div>
     <div id="toast"></div>
-
     <script>
+      const state = {
+        towers: new Map(),
+        selectedId: null,
+      };
+      const trafficProfiles = {
+        balanced: {
+          label: 'Balanced NSW retail',
+          description: '1 message/second steady flow with NSW + retail payload hints.',
+          interval_seconds: 1.0,
+          jitter_seconds: 0.4,
+          topic: null,
+          payload_template: { region: 'NSW', channel: 'retail' },
+        },
+        bursty: {
+          label: 'Bursty metro upgrades',
+          description: '0.5 messages/second with higher jitter and metro rollout metadata.',
+          interval_seconds: 2.0,
+          jitter_seconds: 1.5,
+          topic: 'metro-upgrades',
+          payload_template: { region: 'VIC', channel: 'enterprise', campaign: 'metro-upgrade' },
+        },
+        sleepy: {
+          label: 'Sleepy regional telemetry',
+          description: '0.2 messages/second calm baseline with rural context.',
+          interval_seconds: 5.0,
+          jitter_seconds: 1.0,
+          topic: 'regional-telemetry',
+          payload_template: { region: 'QLD', channel: 'regional', site_status: 'monitoring' },
+        },
+      };
+      const tabsContainer = document.getElementById('tower-tabs');
+      const emptyTabsMessage = document.getElementById('tab-empty');
+      const towerPanel = document.getElementById('tower-panel');
+      const emptyPanel = document.getElementById('empty-panel');
       const toast = document.getElementById('toast');
+      const profileSelect = document.getElementById('tower-profile');
+      const profileDescription = document.getElementById('profile-description');
+      const streamLog = document.getElementById('stream-log');
+      const streamCount = document.getElementById('stream-count');
+      const modal = document.getElementById('create-modal');
+
+      function openModal() {
+        modal.classList.add('visible');
+        modal.setAttribute('aria-hidden', 'false');
+        document.getElementById('tower-id').focus();
+      }
+
+      function closeModal() {
+        modal.classList.remove('visible');
+        modal.setAttribute('aria-hidden', 'true');
+      }
+
+      document.querySelectorAll('[data-open-create]').forEach((btn) =>
+        btn.addEventListener('click', openModal)
+      );
+      document.querySelectorAll('[data-close-modal]').forEach((btn) =>
+        btn.addEventListener('click', closeModal)
+      );
+      modal.addEventListener('click', (event) => {
+        if (event.target === modal) {
+          closeModal();
+        }
+      });
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && modal.classList.contains('visible')) {
+          closeModal();
+        }
+      });
+
+      function updateProfileDescription() {
+        const profile = trafficProfiles[profileSelect.value];
+        profileDescription.textContent = profile ? profile.description : '';
+      }
+      profileSelect.addEventListener('change', updateProfileDescription);
+      updateProfileDescription();
 
       function showToast(message, isError = false) {
         toast.textContent = message;
         toast.style.display = 'block';
-        toast.style.background = isError ? '#ef4444' : '#0f172a';
-        setTimeout(() => (toast.style.display = 'none'), 2200);
+        toast.style.background = isError ? '#b91c1c' : '#0f172a';
+        setTimeout(() => (toast.style.display = 'none'), 2500);
       }
 
-      async function refreshStatus() {
+      function renderTabs() {
+        tabsContainer.innerHTML = '';
+        const entries = Array.from(state.towers.values()).sort((a, b) =>
+          (a.started_at || '').localeCompare(b.started_at || '')
+        );
+        if (!entries.length) {
+          emptyTabsMessage.style.display = 'block';
+          return;
+        }
+        emptyTabsMessage.style.display = 'none';
+        entries.forEach((producer) => {
+          const button = document.createElement('button');
+          button.className = 'tab-button' + (producer.producer_id === state.selectedId ? ' active' : '');
+          button.dataset.id = producer.producer_id;
+          button.innerHTML = `
+            <div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span class="status-dot" style="background:${producer.running ? '#22c55e' : '#94a3b8'}"></span>
+                <strong>${producer.producer_id}</strong>
+              </div>
+              <div class="meta">${producer.messages_sent} msgs • ${producer.interval_seconds.toFixed(1)}s interval</div>
+            </div>
+            <span class="meta">${producer.last_sent_at || 'pending'}</span>
+          `;
+          button.addEventListener('click', () => {
+            state.selectedId = producer.producer_id;
+            renderTabs();
+            renderPanel();
+            renderOverview();
+          });
+          tabsContainer.appendChild(button);
+        });
+      }
+
+      function renderStream(events) {
+        const sorted = (events || []).slice().sort((a, b) =>
+          new Date(b.event_time || 0) - new Date(a.event_time || 0)
+        );
+        streamLog.innerHTML = '';
+        sorted.forEach((event) => {
+          const wrapper = document.createElement('div');
+          wrapper.className = 'stream-item';
+          wrapper.innerHTML = `
+            <div class="stream-item-header">
+              <span>${new Date(event.event_time).toLocaleTimeString()}</span>
+              <span>${event.topic || 'default'}</span>
+            </div>
+            <pre>${JSON.stringify(event.payload, null, 2)}</pre>
+          `;
+          streamLog.appendChild(wrapper);
+        });
+        streamCount.textContent = `${sorted.length} recent event${sorted.length === 1 ? '' : 's'}`;
+      }
+
+      function renderPanel() {
+        if (!state.selectedId || !state.towers.has(state.selectedId)) {
+          emptyPanel.style.display = 'block';
+          towerPanel.style.display = 'none';
+          return;
+        }
+        const selected = state.towers.get(state.selectedId);
+        emptyPanel.style.display = 'none';
+        towerPanel.style.display = 'flex';
+        document.getElementById('panel-name').textContent = selected.producer_id;
+        const topic = selected.topic || 'Default topic';
+        document.getElementById('panel-topic').textContent = topic;
+        document.getElementById('panel-description').textContent = `Mirroring to ${topic}`;
+        document.getElementById('panel-interval').textContent = `${selected.interval_seconds.toFixed(2)}s`;
+        document.getElementById('panel-jitter').textContent = `${selected.jitter_seconds.toFixed(2)}s`;
+        const throughput = selected.interval_seconds ? (1 / selected.interval_seconds).toFixed(1) : '—';
+        document.getElementById('panel-throughput').textContent = throughput === '—' ? '—' : `${throughput} msg/s`;
+        document.getElementById('panel-messages').textContent = selected.messages_sent;
+        document.getElementById('panel-started').textContent = selected.started_at || '—';
+        document.getElementById('panel-last').textContent = selected.last_sent_at || '—';
+        const statusChip = document.getElementById('panel-status');
+        statusChip.textContent = selected.running ? 'Producing data' : 'Stopped';
+        statusChip.style.background = selected.running ? '#dcfce7' : '#e2e8f0';
+        statusChip.style.color = selected.running ? '#166534' : '#475569';
+        document.getElementById('status-detail').textContent = selected.running
+          ? `Streaming every ${selected.interval_seconds.toFixed(1)}s`
+          : 'Tower paused';
+        const cacheDepth = (selected.recent_events || []).length;
+        document.getElementById('cache-depth').textContent = `${cacheDepth} cached event${cacheDepth === 1 ? '' : 's'}`;
+        document.getElementById('databricks-topic').textContent = topic;
+        const lastPayload = (selected.recent_events || [])[0]?.payload;
+        const payloadBytes = lastPayload ? JSON.stringify(lastPayload).length : 0;
+        document.getElementById('panel-payload-size').textContent = payloadBytes
+          ? `~${payloadBytes} bytes`
+          : '—';
+        document.getElementById('panel-latency').textContent = selected.last_sent_at
+          ? selected.last_sent_at
+          : 'Awaiting first event';
+        renderStream(selected.recent_events || []);
+      }
+
+      function renderOverview() {
+        const heroCount = document.getElementById('hero-count');
+        const heroEvents = document.getElementById('hero-events');
+        const ticker = document.getElementById('telemetry-ticker');
+        heroCount.textContent = state.towers.size;
+        const eventTotal = Array.from(state.towers.values()).reduce(
+          (sum, tower) => sum + (tower.recent_events ? tower.recent_events.length : 0),
+          0
+        );
+        heroEvents.textContent = eventTotal;
+        if (!state.towers.size) {
+          ticker.textContent = 'Awaiting first tower to broadcast telemetry…';
+          return;
+        }
+        const preferred = state.towers.get(state.selectedId) || Array.from(state.towers.values())[0];
+        const latestEvent = (preferred.recent_events || [])[0];
+        const time = latestEvent?.event_time ? new Date(latestEvent.event_time).toLocaleTimeString() : 'pending';
+        ticker.textContent = `${preferred.producer_id} • ${preferred.messages_sent} msgs • last signal ${time}`;
+      }
+
+      async function refreshStatus(showErrors = false) {
         try {
           const res = await fetch('/api/producers');
           const data = await res.json();
-          const tbody = document.getElementById('status-body');
-          tbody.innerHTML = '';
-          if (!data.length) {
-            tbody.innerHTML = '<tr><td colspan="8">No producers running.</td></tr>';
-            return;
+          state.towers = new Map(data.map((item) => [item.producer_id, item]));
+          if (state.towers.size && (!state.selectedId || !state.towers.has(state.selectedId))) {
+            state.selectedId = data[0].producer_id;
+          } else if (!state.towers.size) {
+            state.selectedId = null;
           }
-          data.forEach((row) => {
-            const tr = document.createElement('tr');
-            const dotColor = row.running ? '#22c55e' : '#94a3b8';
-            tr.innerHTML = `
-              <td><span class="status-dot" style="background:${dotColor}"></span>${row.running ? 'running' : 'stopped'}</td>
-              <td>${row.producer_id}</td>
-              <td>${row.topic}</td>
-              <td>${row.interval_seconds.toFixed(2)}s</td>
-              <td>${row.jitter_seconds.toFixed(2)}s</td>
-              <td>${row.messages_sent}</td>
-              <td>${row.started_at}</td>
-              <td>${row.last_sent_at || ''}</td>
-            `;
-            tbody.appendChild(tr);
-          });
+          renderTabs();
+          renderPanel();
+          renderOverview();
         } catch (err) {
           console.error(err);
-          showToast('Failed to load status', true);
+          if (showErrors) {
+            showToast('Failed to load tower status', true);
+          }
         }
       }
 
-      document.getElementById('start-form').addEventListener('submit', async (e) => {
+      document.getElementById('tower-form').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const producerId = document.getElementById('producer-id').value.trim();
-        const topic = document.getElementById('topic').value.trim();
-        const interval = parseFloat(document.getElementById('interval').value) || 1;
-        const jitter = parseFloat(document.getElementById('jitter').value) || 0;
-        const templateRaw = document.getElementById('payload-template').value.trim();
-        let payloadTemplate = {};
-        if (templateRaw) {
+        const id = document.getElementById('tower-id').value.trim();
+        const profile = trafficProfiles[profileSelect.value] || trafficProfiles.balanced;
+        const topicOverride = document.getElementById('tower-topic').value.trim();
+        const intervalValue = document.getElementById('tower-interval').value;
+        const jitterValue = document.getElementById('tower-jitter').value;
+        const payloadRaw = document.getElementById('tower-payload').value.trim();
+        const interval = intervalValue ? parseFloat(intervalValue) : profile.interval_seconds;
+        const jitter = jitterValue ? parseFloat(jitterValue) : profile.jitter_seconds;
+        let payload = profile.payload_template;
+        if (payloadRaw) {
           try {
-            payloadTemplate = JSON.parse(templateRaw);
+            payload = JSON.parse(payloadRaw);
           } catch (err) {
-            showToast('Invalid JSON in payload template', true);
+            showToast('Payload template must be valid JSON', true);
             return;
           }
         }
-
+        if (!id) {
+          showToast('Provide a tower id', true);
+          return;
+        }
         try {
           const res = await fetch('/api/producers', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              producer_id: producerId,
-              topic: topic || null,
+              producer_id: id,
+              topic: topicOverride || profile.topic || null,
               interval_seconds: interval,
               jitter_seconds: jitter,
-              payload_template: payloadTemplate,
+              payload_template: payload,
             }),
           });
           if (!res.ok) throw new Error(await res.text());
-          showToast('Producer started');
+          showToast(`Tower ${id} is producing data`);
+          state.selectedId = id;
+          document.getElementById('tower-form').reset();
+          profileSelect.value = 'balanced';
+          updateProfileDescription();
+          closeModal();
           refreshStatus();
         } catch (err) {
           console.error(err);
-          showToast('Failed to start producer', true);
+          showToast('Failed to start tower', true);
         }
       });
 
+      document.getElementById('stop-btn').addEventListener('click', async () => {
+        if (!state.selectedId) return;
+        try {
+          const res = await fetch(`/api/producers/${encodeURIComponent(state.selectedId)}`, {
+            method: 'DELETE',
+          });
+          if (!res.ok) throw new Error(await res.text());
+          showToast(`Tower ${state.selectedId} stopped`);
+          refreshStatus();
+        } catch (err) {
+          console.error(err);
+          showToast('Unable to stop tower', true);
+        }
+      });
+
+      document.getElementById('refresh-btn').addEventListener('click', () => refreshStatus(true));
+
       document.getElementById('alert-form').addEventListener('submit', async (e) => {
         e.preventDefault();
+        if (!state.selectedId) {
+          showToast('Select a tower first', true);
+          return;
+        }
         try {
           const res = await fetch('/api/alert', {
             method: 'POST',
@@ -285,69 +990,22 @@
               message: document.getElementById('alert-message').value,
               severity: document.getElementById('alert-severity').value,
               topic: document.getElementById('alert-topic').value || null,
-              producer_id: document.getElementById('alert-producer').value || null,
+              producer_id: state.selectedId,
             }),
           });
           if (!res.ok) throw new Error(await res.text());
-          showToast('Alert sent');
+          showToast('Alert sent to Zerobus');
+          document.getElementById('alert-form').reset();
+          document.getElementById('alert-severity').value = 'warning';
         } catch (err) {
           console.error(err);
           showToast('Failed to send alert', true);
         }
       });
 
-      async function stopProducer() {
-        const id = document.getElementById('stop-id').value.trim();
-        if (!id) {
-          showToast('Provide a producer id', true);
-          return;
-        }
-        try {
-          const res = await fetch(`/api/producers/${encodeURIComponent(id)}`, { method: 'DELETE' });
-          if (!res.ok) throw new Error(await res.text());
-          showToast('Producer stopped');
-          refreshStatus();
-        } catch (err) {
-          console.error(err);
-          showToast('Failed to stop producer', true);
-        }
-      }
-
-      async function stopAll() {
-        const tbody = document.getElementById('status-body');
-        const ids = Array.from(tbody.querySelectorAll('tr td:nth-child(2)'))
-          .map((cell) => cell.textContent)
-          .filter(Boolean);
-        await Promise.all(ids.map((id) => fetch(`/api/producers/${id}`, { method: 'DELETE' })));
-        showToast('Stop all requested');
-        refreshStatus();
-      }
-
-      async function startDemoSet() {
-        const demoProducers = [
-          { id: 'kiosk-1', payload: { region: 'NSW', channel: 'retail' } },
-          { id: 'kiosk-2', payload: { region: 'VIC', channel: 'online' }, interval: 1.2 },
-          { id: 'kiosk-3', payload: { region: 'QLD', channel: 'partner' }, interval: 0.8 },
-        ];
-        for (const demo of demoProducers) {
-          await fetch('/api/producers', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              producer_id: demo.id,
-              interval_seconds: demo.interval || 1,
-              jitter_seconds: 0.3,
-              payload_template: demo.payload,
-            }),
-          });
-        }
-        refreshStatus();
-        showToast('Demo producers launched');
-      }
-
-      setInterval(refreshStatus, 2000);
+      renderOverview();
       refreshStatus();
+      setInterval(refreshStatus, 2000);
     </script>
   </body>
 </html>
-

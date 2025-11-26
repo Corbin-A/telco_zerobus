@@ -16,15 +16,25 @@ From Databricks:
    The numeric/hex value after `?o=` (or `/o=`) becomes your `<workspace-id>` and
    is required when Databricks provisions your Zerobus server endpoint.
 2. **Unity Catalog table** – identify (or create) the table that should receive
-   these demo events. Example:
+   these demo events. The Zerobus SDK **does not support VARIANT columns**,
+   so keep the schema flat and typed. Example aligned to the demo payload:
 
    ```sql
-   CREATE TABLE main.default.air_quality (
-     device_name STRING,
-     temp INT,
-     humidity BIGINT
+   CREATE TABLE main.default.zerobus_demo (
+     producer_id STRING,
+     sequence BIGINT,
+     observed_at STRING,
+     region STRING,
+     channel STRING,
+     campaign STRING,
+     site_status STRING,
+     severity STRING,
+     message STRING
    );
    ```
+
+   If you previously used a `VARIANT`/`MAP` column for the payload, replace it
+   with explicit columns before generating the protobuf.
 
 3. **Service principal** – create one in the workspace, capture its client id and
    secret, and grant it `USE CATALOG`, `USE SCHEMA`, plus `MODIFY`/`SELECT` on the
@@ -68,7 +78,8 @@ On your laptop:
      suffix (for example `https://e2-demo-field-eng.cloud.databricks.com`).
    - `ZEROBUS_SERVER_ENDPOINT` – Zerobus host from Databricks
    - `ZEROBUS_CLIENT_ID` / `ZEROBUS_CLIENT_SECRET` – service principal values
-   - `ZEROBUS_PROTO_MODULE` / `ZEROBUS_PROTO_MESSAGE` – e.g. `record_pb2` / `AirQuality`
+- `ZEROBUS_PROTO_MODULE` / `ZEROBUS_PROTO_MESSAGE` – e.g. `record_pb2` /
+  `ZerobusDemo` (matching the message name generated from your table)
    - `ZEROBUS_TARGET_TABLE` – fully-qualified Unity Catalog table
 
 3. Export the values so the Databricks CLI tooling can read them (or manually
@@ -96,6 +107,34 @@ On your laptop:
      --table "$ZEROBUS_TARGET_TABLE" \
      --output record.proto
    ```
+
+   If you see `Unknown column type: variant`, rebuild the Unity Catalog table
+   with explicit columns (no `VARIANT`/`MAP`), then re-run the generator.
+
+   **Seeing `OAuth request failed ... invalid_client`?** That means the
+   Databricks workspace rejected the service principal credentials. Double-check
+   that:
+
+   - The `ZEROBUS_CLIENT_ID`/`ZEROBUS_CLIENT_SECRET` pair came from
+     **Settings → Identity & access → Service principals** within the same
+     workspace referenced by `DATABRICKS_HOST` (account-level service principals
+     must also be assigned to the workspace).
+   - The secret was generated using **Generate secret** (copy the value when it
+     appears—Databricks will not show it again).
+   - The service principal still exists and has not been rotated or deleted.
+
+   To verify the credentials outside of the Zerobus tooling, try requesting a
+   token directly:
+
+   ```bash
+   curl -u "$ZEROBUS_CLIENT_ID:$ZEROBUS_CLIENT_SECRET" \
+     -d 'grant_type=client_credentials&scope=all-apis' \
+     "$DATABRICKS_HOST/oidc/v1/token"
+   ```
+
+   A JSON token response confirms the credentials are valid; an `invalid_client`
+   response means you must fix the ID/secret (or grant the service principal to
+   the workspace) before the protobuf generator will work.
 
 5. Compile the protobuf to a Python module. The example below emits
    `record_pb2.py` in the repo root so it is importable without touching

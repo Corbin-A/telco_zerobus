@@ -124,9 +124,11 @@ class ProducerManager:
             "event_type": "alert",
             "event_time": now.isoformat(),
             "payload": {
+                "producer_id": request.producer_id or "manual_alert",
+                "sequence": -1,
+                "observed_at": now.isoformat(),
                 "severity": request.severity,
                 "message": request.message,
-                "raised_at": now.isoformat(),
             },
         }
         return await self.client.send_events([event], topic=request.topic)

@@ -614,8 +614,8 @@
               <h3>Send manual alert</h3>
               <form id="alert-form">
                 <div>
-                  <label for="alert-message">Message</label>
-                  <input id="alert-message" placeholder="Tower maintenance event" required />
+                <label for="alert-details">Details</label>
+                <input id="alert-details" placeholder="Tower maintenance event" required />
                 </div>
                 <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                   <div style="flex: 1; min-width: 160px;">
@@ -987,7 +987,7 @@
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              message: document.getElementById('alert-message').value,
+              details: document.getElementById('alert-details').value,
               severity: document.getElementById('alert-severity').value,
               topic: document.getElementById('alert-topic').value || null,
               producer_id: state.selectedId,

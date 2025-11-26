@@ -128,7 +128,7 @@ class ProducerManager:
                 "sequence": -1,
                 "observed_at": now.isoformat(),
                 "severity": request.severity,
-                "message": request.message,
+                "details": request.details,
             },
         }
         return await self.client.send_events([event], topic=request.topic)

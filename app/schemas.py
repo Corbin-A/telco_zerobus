@@ -42,7 +42,9 @@ class ProducerStatus(BaseModel):
 
 
 class ManualAlertRequest(BaseModel):
-    message: str = Field(..., description="Human-readable alert body")
+    details: str = Field(
+        ..., alias="message", description="Human-readable alert details"
+    )
     severity: str = Field(
         "warning",
         description="Severity flag sent to Zerobus; e.g. info|warning|critical",
@@ -53,4 +55,7 @@ class ManualAlertRequest(BaseModel):
     topic: Optional[str] = Field(
         default=None, description="Optional topic/stream name; defaults to settings"
     )
+
+    class Config:
+        allow_population_by_field_name = True
 

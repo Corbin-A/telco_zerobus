@@ -20,21 +20,25 @@ From Databricks:
    so keep the schema flat and typed. Example aligned to the demo payload:
 
    ```sql
-   CREATE TABLE main.default.zerobus_demo (
-     producer_id STRING,
-     sequence BIGINT,
-     observed_at STRING,
-     region STRING,
-     channel STRING,
-     campaign STRING,
-     site_status STRING,
-     severity STRING,
-     message STRING
-   );
+    CREATE TABLE main.default.zerobus_demo (
+      producer_id STRING,
+      sequence BIGINT,
+      observed_at STRING,
+      region STRING,
+      channel STRING,
+      campaign STRING,
+      site_status STRING,
+      severity STRING,
+      details STRING
+    );
    ```
 
    If you previously used a `VARIANT`/`MAP` column for the payload, replace it
    with explicit columns before generating the protobuf.
+
+   **Avoid reserved protobuf names.** The Zerobus proto generator will fail if a
+   column name collides with a protobuf keyword (for example `message`). Rename
+   that column (for example to `details`) before regenerating the proto.
 
 3. **Service principal** – create one in the workspace, capture its client id and
    secret, and grant it `USE CATALOG`, `USE SCHEMA`, plus `MODIFY`/`SELECT` on the
@@ -176,7 +180,7 @@ On your laptop:
 - `POST /api/producers` – start a producer (JSON body: `producer_id`, optional
   `topic`, `interval_seconds`, `jitter_seconds`, `payload_template`)
 - `DELETE /api/producers/{producer_id}` – stop a producer
-- `POST /api/alert` – send a manual alert (`message`, optional `severity`, `topic`,
+- `POST /api/alert` – send a manual alert (`details`, optional `severity`, `topic`,
   `producer_id`)
 
 ## Tailoring to your Zerobus ingest stream

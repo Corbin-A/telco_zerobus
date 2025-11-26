@@ -69,7 +69,12 @@ On your laptop:
    anything else. (They are referenced by the CLI tooling as well as the app.)
 
    ```bash
-   cp .env.example .env  # edit values inside
+   python -m zerobus.tools.generate_proto \
+     --uc-endpoint "$DATABRICKS_HOST" \
+     --client-id "$ZEROBUS_CLIENT_ID" \
+     --client-secret "$ZEROBUS_CLIENT_SECRET" \
+     --table "$ZEROBUS_TARGET_TABLE" \
+     --output record.proto
    ```
 
    Key variables:

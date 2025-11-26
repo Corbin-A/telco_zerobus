@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, Field, validator
 
@@ -35,10 +35,16 @@ class ProducerStatus(BaseModel):
     last_sent_at: Optional[datetime]
     messages_sent: int
     topic: str
+    recent_events: List[Dict[str, Any]] = Field(
+        default_factory=list,
+        description="Recent sample events mirrored for the UI stream",
+    )
 
 
 class ManualAlertRequest(BaseModel):
-    message: str = Field(..., description="Human-readable alert body")
+    details: str = Field(
+        ..., alias="message", description="Human-readable alert details"
+    )
     severity: str = Field(
         "warning",
         description="Severity flag sent to Zerobus; e.g. info|warning|critical",
@@ -49,4 +55,7 @@ class ManualAlertRequest(BaseModel):
     topic: Optional[str] = Field(
         default=None, description="Optional topic/stream name; defaults to settings"
     )
+
+    class Config:
+        allow_population_by_field_name = True
 
